@@ -6,9 +6,13 @@ export class events {
             cy.get('#event-new').should('have.class', 'btn')
             cy.get('#event-new').click()
 
-            const max = 10000;
-            const random = Math.random() * max;
-            cy.get('#tickethoy_adminbundle_events_nombre').type('Event Test Cypress '+ random)
+            // const max = 10000;
+            // const random = Math.random() * max;
+            const random = generateRandomId();
+            const event = 'Evento_test_'+ random
+            cy.get('#tickethoy_adminbundle_events_nombre').type(event)
+            cy.log(event)
+            cy.wait(6)
             cy.get('#tickethoy_adminbundle_events_categoria').select('169')
             cy.get('#tickethoy_adminbundle_events_place').select('312')
             cy.wait(6000)
@@ -35,8 +39,12 @@ export class events {
 
             cy.get('#event_url > a').then($a => {
                 const href = $a.attr('href');
-                resolve(href);
+                resolve({href, event});
             });
         });
     }
+}
+
+function generateRandomId() {
+    return Math.random().toString(36).substring(2, 15);
 }

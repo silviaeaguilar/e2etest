@@ -6,13 +6,9 @@ export class events {
             cy.get('#event-new').should('have.class', 'btn')
             cy.get('#event-new').click()
 
-            // const max = 10000;
-            // const random = Math.random() * max;
             const random = generateRandomId();
             const event = 'Evento_test_'+ random
             cy.get('#tickethoy_adminbundle_events_nombre').type(event)
-            cy.log(event)
-            cy.wait(6)
             cy.get('#tickethoy_adminbundle_events_categoria').select('169')
             cy.get('#tickethoy_adminbundle_events_place').select('312')
             cy.wait(6000)
@@ -37,10 +33,18 @@ export class events {
             cy.get('#modal-btn-yes-publish').click()
             cy.get('#tab-seo-element').click()
 
+            let href
+            let event_id
             cy.get('#event_url > a').then($a => {
-                const href = $a.attr('href');
-                resolve({href, event});
+                href = $a.attr('href');
             });
+
+            cy.visit(url + '/admin/events/')
+            cy.get('#events-table > tbody > :nth-child(1) > .sorting_1').invoke('text').then((text) => {
+                event_id = text.trim();
+                resolve({href, event_id});
+            });
+
         });
     }
 }

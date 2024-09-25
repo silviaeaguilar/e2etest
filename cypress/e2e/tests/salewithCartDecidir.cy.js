@@ -10,7 +10,7 @@ describe('Create and sale event with cart', function (){
     beforeEach(function (){
         cy.fixture('configuration').then((data) => {
             url = data.baseurl
-            login.login()
+            login.login(url)
         })
     })
 
@@ -22,9 +22,10 @@ describe('Create and sale event with cart', function (){
         });
 
         // wait from bin/console th-cron:generate-functionsector-tickets
-        cy.wait(30000)
+        cy.wait(60000);
         cy.get('.btn-comprar-evento').click()
         cy.get('#first_step_cantidad').select('1')
+        cy.wait(10000);
         cy.get('#add-cart').click()
         cy.location('pathname').should('eq', '/cart/detail')
         cy.get('#btn-comprar-checkout').click()

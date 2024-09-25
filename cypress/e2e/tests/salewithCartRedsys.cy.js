@@ -17,14 +17,13 @@ describe('Create and sale event with cart', function (){
     it('Create and sale event with cart', ()=> {
         event.new(url).then(({href, event_id}) => {
             //set payment provider
-            provider.webpay(url, event_id)
+            provider.redsys(url, event_id)
             cy.visit(href)
         });
 
         // wait from bin/console th-cron:generate-functionsector-tickets
         cy.wait(50000)
         cy.get('.btn-comprar-evento').click()
-        cy.wait(2000);
         cy.get('#first_step_cantidad').select('1')
         cy.get('#add-cart').click()
         cy.location('pathname').should('eq', '/cart/detail')
@@ -33,24 +32,22 @@ describe('Create and sale event with cart', function (){
         login.frontLogin()
 
         cy.location('pathname').should('eq', '/checkout')
-        cy.get('#btn-webpay-wm').click()
+        cy.get('#btn-redsys-submit').click()
         cy.wait(5000)
-        cy.origin('https://webpay3gint.transbank.cl/webpayserver/dist/#/', () => {
-            cy.get('button.payment-options__method-items-option').contains('Débito').click();
-            cy.get('button.combobox-button').contains('Selecciona tu banco').click();
-            cy.contains('li button span', 'TEST COMMERCE BANK').click();
-            cy.get('input[formcontrolname="pan"]').type('4051 8842 3993 7763');
-            cy.get('button.submit').contains('Pagar').click();
+        cy.origin('https://sis-t.redsys.es:25443/sis/realizarPago', () => {
+            cy.get('#card-number').type('4548810000000003')
+            cy.get('#card-expiration').type('1249')
+            cy.get('#card-cvv').type('123')
+            cy.get('#divImgAceptar').click()
         });
 
-        cy.origin('https://webpay3gint.transbank.cl/testcommercebank/authenticator.cgi', () => {
-            cy.get('#rutClient').type('111111111')
-            cy.get('#passwordClient').type('123')
-            cy.get('input[type="submit"][value="Aceptar"]').click();
+        cy.wait(10000)
+        cy.origin('https://sis-d.redsys.es/sis-simulador-web/authenticationRequest.jsp', () => {
+            cy.get('#boton').click()
         })
-
-        cy.origin('https://webpay3gint.transbank.cl/testcommercebank/authenticatorProcess.cgi', () => {
-            cy.get('input[type="submit"][value="Continuar"]').click();
+        cy.wait(10000)
+        cy.origin('https://sis-t.redsys.es:25443', () => {
+            cy.get('input[type="button"][value="Continuar"]').click();
 
         })
 

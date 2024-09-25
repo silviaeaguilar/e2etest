@@ -1,7 +1,7 @@
 export class logins{
-    login(){
+    login(url){
         cy.fixture('configuration').then((data) => {
-            cy.visit(data.baseurl+'/admin/login')
+            cy.visit(url+'/admin/login')
             cy.get('#username').type(data.userdashboard)
             cy.get('#_password').type(data.passworddashboard)
             cy.get('#admin-login-button').click()
